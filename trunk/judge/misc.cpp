@@ -45,7 +45,7 @@ void check_add_java_security(string &t){
 //打印使用信息
 void usage(int argc, char *argv[]){
     (void)printf("Usage:\n");
-    (void)printf("  %s <cmd> <TmpDir> <InFile> <OutFile> " 
+    (void)printf("  %s <cmd> <lang=0~4> <TmpDir> <InFile> <OutFile> " 
                  "<TimeLimit> <MemLimit> <OutLimit> [SPJ]\n",
                  argv[0]);
     (void)printf("The last parameter [SPJ] is optional.\n");
