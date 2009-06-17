@@ -1,0 +1,13 @@
+Judge:
+
+输入接口:
+    程序命令行
+    输入文件(xx.in)
+    输出文件(xx.out)
+    时间限制
+    内存限制
+    SPJ路径（NULL表示非SPJ）
+
+输出接口：
+    输出judge结果的编号
+    main返回0表示正常结束，返回非0表示System Error
