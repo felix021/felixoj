@@ -43,7 +43,8 @@ void check_add_java_security(string &t){
 }
 
 const char usage_str[] = 
-"FelixOJ Judge接口\n"
+"\n"
+" -----  FelixOJ Judge接口  ------\n"
 "\n"
 "  输入: 命令行参数(如果某参数包含空格，记得用引号...)\n"
 "      -e 需要执行的程序(如果是java，则需要包含完整的java ooox命令行)\n"
@@ -62,6 +63,10 @@ const char usage_str[] =
 "      其中OJ_RESULT参见 judge.h 中的定义\n"
 "   2. 如果judge过程非正常结束，返回非0，标准输出空\n"
 "      其中返回值的具体含义参见 judge.h 中的定义\n"
+"   3. 程序的标准输出被重定向到临时文件夹的stdout.txt\n"
+"      程序的错误输出被重定向到临时文件夹的stderr.txt\n"
+"      调用者需要确保不会和输入输出测试文件冲突\n"
+"      这两个文件的使用和删除需要调用者处理\n"
 "\n"
 "\n"
 "  SPJ接口\n"
