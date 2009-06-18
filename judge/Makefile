@@ -1,9 +1,9 @@
 TARGET=judge
 CC=g++
-MACROS=-DDEBUG=1
+#MACROS=-DDEBUG=1
 OBJS=judge.o misc.o
 
-.PHONY: clean
+.PHONY: clean tags
 
 $(TARGET): $(OBJS)
 	$(CC) -O2 -o $@ $^
@@ -17,3 +17,6 @@ misc.o: misc.cpp
 clean:
 	rm -rf $(OBJS)
 	rm -rf $(TARGET)
+
+tags:
+	ctags -R
