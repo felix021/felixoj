@@ -457,7 +457,7 @@ int special_judge(){
         case 4:
             return OJ_WA;
         default:
+            dp("SPJ BAD RETURN VALUE: %d\n", res);
             exit(EXIT_SPJ_UNKNOWN);
     }
-    return res;
 }
