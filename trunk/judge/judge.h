@@ -8,19 +8,20 @@ const int OJ_PE         = 2; //OK
 const int OJ_TLE        = 3; //OK
 const int OJ_MLE        = 4; //OK
 const int OJ_WA         = 5; //OK
-const int OJ_OLE        = 6; //!!!
+const int OJ_OLE        = 6; //OK
 const int OJ_CE         = 7; //OK
-const int OJ_RE_SEGV    = 8; //!!!
+const int OJ_RE_SEGV    = 8; //OK
 const int OJ_RE_FPE     = 9; //OK
 const int OJ_RE_BUS     = 10;//OK
 const int OJ_RE_ABRT    = 11;//OK
 const int OJ_RE_UNKNOWN = 12;//OK
 const int OJ_RF         = 13;//OK
-const int OJ_SE         = 14;//OK System Error
+const int OJ_SE         = 14;//System Error
 
 //退出代码
 const int EXIT_OK               =   0;
 const int EXIT_BAD_USAGE        =   2;
+const int EXIT_BAD_ARG          =   2;
 const int EXIT_BAD_TIME_LIMIT   =   4;
 const int EXIT_BAD_LANG         =   5;
 const int EXIT_BAD_MEM_LIMIT    =   6;
@@ -42,6 +43,12 @@ const int EXIT_PTRACE_SYSCALL   =   34;
 const int EXIT_FILEREADER_OPEN  =   36;
 const int EXIT_FILEREADER_READ  =   38;
 const int EXIT_FILEREADER_CLOSE =   40;
+const int EXIT_WAIT4            =   42;
+const int EXIT_SPJ_POPEN        =   44;
+const int EXIT_SPJ_PCLOSE       =   46;
+const int EXIT_SPJ_TIMEOUT      =   48;
+const int EXIT_SPJ_FSCANF       =   50;
+const int EXIT_SPJ_UNKNOWN      =   52;
 const int EXIT_UNKNOWN          =   64;
 
 const int MEGA= 1048576; // 1 M

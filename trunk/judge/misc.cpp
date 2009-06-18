@@ -42,28 +42,109 @@ void check_add_java_security(string &t){
     t += " -Djava.security.manager";
 }
 
+const char usage_str[] = 
+"FelixOJ Judge接口\n"
+"\n"
+"  输入: 命令行参数(如果某参数包含空格，记得用引号...)\n"
+"      -e 需要执行的程序(如果是java，则需要包含完整的java ooox命令行)\n"
+"      -l 语言类型(0 = C, 1 = C++, 2 = pascal, 3 = Java)\n"
+"      -d 临时文件夹 (用于存储程序输出)\n"
+"      -I 输入文件 (如data/1001/test.in)\n"
+"      -O 输出文件 (如data/1001/test.out)\n"
+"      -t 时间限制，毫秒为单位(默认为1000ms)\n"
+"      -m 内存限制，KB 为单位(默认为65536KB)\n"
+"      -o 输出大小限制，KB 为单位(默认为8192KB)\n"
+"      -s SPJ程序命令行，如不提供则表示不是SPJ\n"
+"      -j -? 显示此提示\n"
+"  输出:\n"
+"   1. 如果judge过程正常结束，返回0，标准输出为\n"
+"      %d %d %d，分别表示 OJ_RESULT, MEM_USED, TIME_USED\n"
+"      其中OJ_RESULT参见 judge.h 中的定义\n"
+"   2. 如果judge过程非正常结束，返回非0，标准输出空\n"
+"      其中返回值的具体含义参见 judge.h 中的定义\n"
+"\n"
+"\n"
+"  SPJ接口\n"
+"      输入: 命令行包含3个文件名，按顺序为 标准输入 标准输出 程序输出\n"
+"      输出: 1, 2, 4分别表示AC, PE, WA\n"
+"      5s内返回0表示正常，否则judge将强行结束spj，并返回System Error\n"
+"      spj不判RF\n"
+"\n"
+"  Example:\n"
+"  Non-SPJ\n"
+"    ./judge -e \"/oj/tmp/9527/a.out\" -d \"/oj/tmp/9527\"\n"
+"        -I \"/oj/data/1001/test.out\" -O \"/oj/data/1001/test.in\"\n"
+"        -t 1000 -m 65536 -o 512 -l 1\n"
+"  SPJ\n"
+"    ./judge -e \"/oj/tmp/9527/a.out\" -d \"/oj/tmp/9527\"\n"
+"        -I \"/oj/data/1001/test.out\" -O \"/oj/data/1001/test.in\"\n"
+"        -t 1000 -m 65536 -o 512 -l 1 -s \"/oj/data/1001/spj\"\n"
+;
 //打印使用信息
-void usage(int argc, char *argv[]){
-    (void)printf("Usage:\n");
-    (void)printf("  %s <cmd> <lang=0~4> <TmpDir> <InFile> <OutFile> " 
-                 "<TimeLimit> <MemLimit> <OutLimit> [SPJ]\n",
-                 argv[0]);
-    (void)printf("The last parameter [SPJ] is optional.\n");
+void usage(){
+    puts(usage_str);
 }
 
 //解析参数
 void parse_argv(int argc, char *argv[]){
-
-    //检查参数个数是否正确
-    if(argc < 9 || argc > 10){
-        usage(argc, argv);
-        exit(EXIT_BAD_USAGE);
+    if(argc < 2){
+        usage();
+        exit(EXIT_BAD_ARG);
     }
+    int opt;
 
-    executive = argv[1]; //可执行程序的完整命令行
+    lang = 1;
+    timelimit = 1000;
+    memlimit = 65536;
+    outlimit = 8192;
 
-    //语言类型
-    sscanf(argv[2], "%d", &lang);
+    while(opt = getopt(argc, argv, "?he:l:d:I:O:t:m:o:s:"), opt != -1){
+        switch(opt){
+            case 'e': //可执行文件路径
+                executive = optarg;
+                break;
+            case 'l': //语言类型 0=c, 1=c++, 2=pascal, 3=java
+                lang = atoi(optarg);
+                break;
+            case 'd': //临时文件夹
+                tmpdir = optarg;
+                break;
+            case 'I': //输入文件
+                infile = optarg;
+                break;
+            case 'O': //输出文件
+                outfile = optarg;
+                break;
+            case 't': //时间限制
+                timelimit = atoi(optarg);
+                break;
+            case 'm': //内存限制
+                memlimit = atoi(optarg);
+                break;
+            case 'o': //输出限制
+                outlimit = atoi(optarg);
+                break;
+            case 's': //SPJexec
+                spjexec = optarg;
+                break;
+            case '?':
+            case 'h':
+                usage();
+                exit(EXIT_OK);
+                break;
+            default:
+                usage();
+                exit(EXIT_BAD_USAGE);
+                break;
+        }
+    }
+    if(executive.empty() || 
+       tmpdir.empty() ||
+       infile.empty() ||
+       outfile.empty()){
+        fprintf(stderr, "NULL ARG\n");
+        exit(EXIT_BAD_ARG);
+    }
     if(lang < 0 || lang > 3){
         fprintf(stderr, "BAD_LANG\n");
         exit(EXIT_BAD_LANG);
@@ -71,52 +152,35 @@ void parse_argv(int argc, char *argv[]){
     if(lang == 3) { //java
         check_add_java_security(executive);
     }
-
-    tmpdir = argv[3]; //临时文件夹
-    infile = argv[4]; //输入测试文件
-    outfile = argv[5]; //输出测试文件
-
-
-    sscanf(argv[6], "%d", &timelimit);
     if(timelimit <= 0){
         fprintf(stderr, "BAD_TIME_LIMIT\n");
         exit(EXIT_BAD_TIME_LIMIT);
     }
-
-    sscanf(argv[7], "%d", &memlimit);
     if(memlimit <= 0){
         fprintf(stderr, "BAD_MEM_LIMIT\n");
         exit(EXIT_BAD_MEM_LIMIT);
     }
-
-    sscanf(argv[8], "%d", &outlimit);
     if(outlimit <= 0){
         fprintf(stderr, "BAD_OUT_LIMIT\n");
         exit(EXIT_BAD_OUT_LIMIT);
     }
 
-    if(argc == 10){
-        spjexec = argv[9];
-    }
-
-#ifdef DEBUG
-    printf("executive = %s\n", executive.c_str());
-    printf("lang = %d\n", lang);
-    printf("tmpdir = %s\n", tmpdir.c_str());
-    printf("infile = %s\n", infile.c_str());
-    printf("outfile = %s\n", outfile.c_str());
-    printf("timelimit = %d ms\n", timelimit);
-    printf("memlimit = %d KB\n", memlimit);
-    printf("outlimit = %d KB\n", outlimit);
-    printf("spjexec = %s\n", spjexec.c_str());
-#endif
+    dp("executive = %s\n", executive.c_str());
+    dp("lang = %d\n", lang);
+    dp("tmpdir = %s\n", tmpdir.c_str());
+    dp("infile = %s\n", infile.c_str());
+    dp("outfile = %s\n", outfile.c_str());
+    dp("timelimit = %d ms\n", timelimit);
+    dp("memlimit = %d KB\n", memlimit);
+    dp("outlimit = %d KB\n", outlimit);
+    dp("spjexec = %s\n", spjexec.c_str());
 }
 
 void dp(const char *fmt, ...){
 #ifdef DEBUG
     va_list args;
     va_start(args, fmt);
-    vfprintf(stdout, fmt, args);
+    vfprintf(stderr, fmt, args);
     va_end(args);
 #endif
 }
@@ -188,7 +252,7 @@ void io_redirect(){
     }
 }
 
-void set_timer(){
+void set_timer(int timelimit){
     struct itimerval now;
     now.it_interval.tv_sec = timelimit / 1000;
     now.it_interval.tv_usec = timelimit % 1000000 + 100000; //放宽100ms
@@ -355,4 +419,45 @@ int compare(const char * f1, const char * f2){
     }else{
         return OJ_WA;
     }
+}
+
+void popen_timeout(int signo){
+    dp("SPJ timed out.\n");
+    exit(EXIT_SPJ_TIMEOUT);
+}
+
+int special_judge(){
+    string cmdline = spjexec + " '" + infile  + "' '" + outfile + "' stdout.txt";
+    dp("SPJ: %s\n", cmdline.c_str());
+    FILE *fp = popen(cmdline.c_str(), "r");
+    if(fp == NULL){
+        perror("popen");
+        exit(EXIT_SPJ_POPEN);
+    }
+    signal(SIGALRM, popen_timeout);
+    signal(SIGVTALRM, popen_timeout);
+    set_timer(5000);
+
+    int res;
+    if(fscanf(fp, "%d", &res) != 1){
+        fprintf(stderr, "fscanf: no output produced from spj\n");
+        exit(EXIT_SPJ_FSCANF);
+    }
+    dp("SPJ res: %d\n", res);
+
+    if(pclose(fp) < 0){
+        perror("pclose");
+        exit(EXIT_SPJ_PCLOSE);
+    }
+    switch(res){
+        case 1:
+            return OJ_AC;
+        case 2:
+            return OJ_PE;
+        case 4:
+            return OJ_WA;
+        default:
+            exit(EXIT_SPJ_UNKNOWN);
+    }
+    return res;
 }

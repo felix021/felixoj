@@ -20,14 +20,15 @@
 #include <sys/syscall.h>
 #include <sys/user.h>
 
-void usage(int argc, char *argv[]);
+void usage();
 void parse_argv(int argc, char *argv[]);
 void dp(const char *fmt, ...);
 void set_limit();
 void io_redirect();
-void set_timer();
+void set_timer(int);
 void init_RF_table();
 bool is_valid_syscall(int num);
 int compare(const char *f1, const char*f2);
+int special_judge();
 
 #endif
