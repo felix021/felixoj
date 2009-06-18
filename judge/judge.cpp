@@ -98,7 +98,7 @@ int main(int argc, char *argv[]){
                 break;
             }
 
-            //判RF（根据Sempr的代码添加的，不理解判断条件）
+            //判RF
             if(WIFSIGNALED(status)){
                 int sig = WTERMSIG(status);
                 dp("sig = %d\n", sig);
@@ -132,12 +132,10 @@ int main(int argc, char *argv[]){
                         result = OJ_RE_UNKNOWN;
                         break;
                 }
-                if(WEXITSTATUS(status) == 5){
-                    kill(child, SIGKILL);
-                }
                 break; //退出循环
             }
 
+            //（根据Sempr的代码添加的，不理解判断条件）
             if(WEXITSTATUS(status) != 5){
                 dp("EXITCODE = %d\n", WEXITSTATUS(status));
                 switch(WEXITSTATUS(status)){
@@ -170,9 +168,7 @@ int main(int argc, char *argv[]){
                         result = OJ_RE_UNKNOWN;
                         break;
                 }
-                if(WEXITSTATUS(status) == 5){
-                    kill(child, SIGKILL);
-                }
+                kill(child, SIGKILL);
                 break; //退出循环
             }
 
